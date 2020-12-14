@@ -1,9 +1,9 @@
 
 public class Card {
 	private String value;
-	private String face;
+	private String suit;
 	
-	public Card(String value, String face) {
+	public Card(String value, String suit) {
 		if(value.equals("jack") || value.equals("king") || value.equals("queen")) {
 			this.value = "10";
 		}else if(value.equals("ace")) {
@@ -14,7 +14,7 @@ public class Card {
 			this.value = value;
 
 		}
-		this.face = face;
+		this.suit = suit;
 	}
 	
 	public String getValue() {
@@ -23,7 +23,7 @@ public class Card {
 	
 	@Override
 	public String toString() {
-		return value + " of " + face;
+		return value + " of " + suit;
 	}
 	
 	

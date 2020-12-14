@@ -12,8 +12,8 @@ public class SlotMachine {
 	private ArrayList<String> values = new ArrayList<String>();
 	private int size;
 
-	public SlotMachine(String moneyLeft) {
-		this.moneyLeft = Double.parseDouble(moneyLeft);
+	public SlotMachine(double moneyLeft) {
+		this.moneyLeft = moneyLeft;
 
 		values.add("1");
 		values.add("2");

@@ -78,6 +78,10 @@ public class BlackJack {
 
 	private boolean deal() {
 		//return true if dealer doesn't have blackjack
+		playerHand.clear();
+		dealerHand.clear();
+		playerHandSum = 0;
+		dealerHandSum = 0;
 		playerHand.push(deck.pop());
 		dealerHand.push(deck.pop());
 		playerHand.push(deck.pop());
@@ -110,27 +114,39 @@ public class BlackJack {
 		}
 	}
 
-	private boolean hit(Stack<Card> hand) {
+	private boolean hit() {
 		//return true if user doesn't bust
 		String out = "Your hand: ";
 		boolean ace = false;
-		if(hand.contains(new Card("ace", "spades")) || hand.contains(new Card("ace", "clubs")) || hand.contains(new Card("ace", "diamonds")) || hand.contains(new Card("ace", "hearts"))){
+		/*if(playerHand.contains(new Card("ace", "spades")) || playerHand.contains(new Card("ace", "clubs")) || playerHand.contains(new Card("ace", "diamonds")) || playerHand.contains(new Card("ace", "hearts"))){
 			ace = true;
-		}
-
-		for(Card c : hand) {
-			playerHandSum += Integer.parseInt(c.getValue());
-			out += c.toString() + ", ";
-		}
+		}*/
+		
+		
 		Card c = deck.pop();
-		hand.push(c);
+		playerHand.push(c);
+		for(Card cx : playerHand) {
+			if(c.getValue().equals("11"))
+				ace = true;
+			out += cx.toString() + ", ";
+		}
 		playerHandSum += Integer.parseInt(c.getValue());
 		out += c.toString() + ", ";
 		if (playerHandSum > 21 && ace) {
 			playerHandSum -= 10;
 			//change ace value from 11 to 1
-		}else if(playerHandSum >= 21) {
+		}
+		if(playerHandSum > 21) {
 			System.out.println(out);
+			System.out.println(playerHandSum);
+			System.out.println("before bust!");
+			for(Card d : playerHand) {
+				System.out.println(d.toString());
+			}
+			System.out.println("dealer");
+			for(Card d : dealerHand) {
+				System.out.println(d.toString());
+			}
 			System.out.println("bust!");
 			choice = "2";
 			return false;
@@ -148,7 +164,7 @@ public class BlackJack {
 		boolean bust = false;
 
 		while(choice.equals("1")) {
-			bust = hit(playerHand);
+			bust = hit();
 			if(playAmt > 1) {
 				System.out.println("Choose move: Hit (1), Stand (2)");
 				choice = myObj.nextLine();
@@ -160,7 +176,32 @@ public class BlackJack {
 
 	}
 
+	public double run() {
+		Scanner myObj = new Scanner(System.in);
+		System.out.println("Your balance: " + balance);
+		System.out.println("Press 1 to start playing: ");
+		if(myObj.nextLine().equals("1")) {
+			System.out.println("Enter amount to bet(no \'$\'): ");
+			double bet = Double.parseDouble(myObj.nextLine());
+			
+			int playAmt = 0;
+			play(bet, playAmt);
+			System.out.println("Play again? yes (1), no (2): ");
+			String again = myObj.nextLine();
+			if(again.equals("1")) {
+				playAmt++;
+				play(bet, playAmt);
+			}
+			else {
+				System.out.println(again);
+				System.out.println("shutting down");
+			}
+		}	
+		myObj.close();
+		return balance;
 
+	}
+	/*
 	public static void main(String[] args) {
 		BlackJack b = new BlackJack(10);
 		Scanner myObj = new Scanner(System.in);
@@ -184,5 +225,5 @@ public class BlackJack {
 			}
 		}	
 		myObj.close();
-	}
+	}*/
 }
