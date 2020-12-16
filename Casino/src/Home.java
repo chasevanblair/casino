@@ -3,6 +3,7 @@ import java.awt.CardLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -17,12 +18,14 @@ import javax.swing.JTextField;
 
 public class Home {
 	public ArrayList<Person> gamblers = new ArrayList();
+	public ArrayList<String> leaderboard = new ArrayList();
 	public Person gambler;
 	public double balance;
 	Scanner in = new Scanner(System.in);
 	private JFrame frame;
 	private JPanel panel;
 	private HomeGui g;
+    private int spin = 0;
 	
 	public Home(String name, double baseBalance) {
 		
@@ -33,21 +36,27 @@ public class Home {
 		gamblers.add(new Person("earl", 30.29));
 		gamblers.add(new Person("regina", 92));
 		gamblers.add(new Person("george", 4342));
-		gamblers.add(new Person("sebastian", 0));
-		
+		gamblers.add(new Person("sebastian", 10));
+
 		
 	}
 	
 	//main runs of each game return balance made/lost for each session
 	public void playBlackjack() {
-		BlackJack b = new BlackJack(gambler.getBalance());
-		balance = b.run();
+		BlackJack b = new BlackJack(gambler.getBalance(), g);
+		gambler.setBalance(b.run());
 		
 	}
 	
 	public void playSlots() {
 		SlotMachine s = new SlotMachine(gambler.getBalance(), g);
+		if(spin == 5) {
+			s.winDef = true;
+			spin = 0;
+		}
 		gambler.setBalance(s.run());
+		//s.winDef = false;
+		spin++;
 		
 	}
 	
@@ -71,28 +80,46 @@ public class Home {
 	        }
 	        gamblers.set(j,key);
 	    }
+	    
+
+		
+		
 	}
 	
 	public void drawHome() {
 		frame = new JFrame();
-		//panel = new JPanel();
-		//panel.setBorder(BorderFactory.createEmptyBorder(50,50,10,10));
-		/*panel.setLayout(new GridLayout(0,1));
-		JButton button = new JButton("testssssssssssssssss");
-		//button
-		JLabel leader = new JLabel("Money Leaderboard");
-		panel.add(leader);
-		System.out.println("Leaderboard: ");*/
-		ArrayList<String> leaderboard = new ArrayList<String>();
+
+		String ret = "";
 		sortLeader();
-
-		for(int i = 1; i <= gamblers.size(); i++) {
-			leaderboard.add(i + ": " + gamblers.get(i-1).toString());
-			
+		for(int x = 1; x <= gamblers.size(); x++) {
+			ret += (x + ": " + gamblers.get(x-1).toString() + "\n");
 		}
+		
+		
 
-		this.g = new HomeGui(leaderboard);
+
+		this.g = new HomeGui();
+		g.leaderList.setText(ret);
+		g.userData.setText( "Name: " + gambler.getName() + "\nBalance: $" + gambler.getBalance());
 		g.money = balance;
+		g.lblBalance.setText("Balance: $" + gambler.getBalance());
+
+		g.btnRefresh.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	sortLeader();
+            	String ret = "";
+            	for(int x = 1; x <= gamblers.size(); x++) {
+        			ret += (x + ": " + gamblers.get(x-1).toString() + "\n");
+        		}
+        		g.leaderList.setText(ret);
+        		g.userData.setText( "Name: " + gambler.getName() + "\nBalance: $" + gambler.getBalance());
+
+        		;
+
+            }
+
+        });
 		g.btnPlay.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -100,6 +127,14 @@ public class Home {
             }
 
         });
+		
+		g.btnDeal.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                playBlackjack();
+            }
+
+        })
 
 		
 		frame.add(g,BorderLayout.CENTER);
@@ -119,26 +154,14 @@ public class Home {
 	
 	public void start() {
 		drawHome();
-		System.out.println("Enter (1) for blackjack, (2) for slot machine: ");
-		boolean again = true;
-		while (again) {
-		if(in.nextLine().equals("1")) {
-			playBlackjack();
-		}
-		else {
-			playSlots();
-		}
-		System.out.println("return to home (1) or quit(2): ");
-		if(in.nextLine().equalsIgnoreCase("1")) {
-			start();
-		}
+		
 		//else {
 			//System.out.println("Returning to home.");
 			//start();
 		//}
 		}
 		
-	}
+	
 	
 	public static void main(String[] args) {
 		/*Scanner in = new Scanner(System.in);
@@ -160,7 +183,7 @@ public class Home {
 	      myPanel.add(new JLabel("Wallet balance:"));
 	      myPanel.add(yField);
 
-	      int result = JOptionPane.showConfirmDialog(null, myPanel, "Please Enter X and Y Values", JOptionPane.OK_CANCEL_OPTION);
+	      int result = JOptionPane.showConfirmDialog(null, myPanel, "Please Enter Data", JOptionPane.OK_CANCEL_OPTION);
 	      if (result == JOptionPane.OK_OPTION) {
 	    	  name = xField.getText();
 	    	  balance = Double.parseDouble(yField.getText());

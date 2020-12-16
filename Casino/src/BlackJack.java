@@ -14,9 +14,11 @@ public class BlackJack {
 	String choice = "";
 	private int playerHandSum = 0;
 	private int dealerHandSum = 0;
+	HomeGui g = new HomeGui();
 
 
-	public BlackJack(double balance) {
+	public BlackJack(double balance, HomeGui g) {
+		this.g = g;
 		this.balance = balance;
 		shuffle();
 	}
@@ -199,7 +201,7 @@ private void compareHands(boolean bust) {
 
 	}
 
-	public void play(double bet, int playAmt) {
+	public void play(double bet) {
 		
 		boolean bust = deal();
 		System.out.println("Choose move: Hit (1), Stand (2)1");
@@ -232,9 +234,15 @@ private void compareHands(boolean bust) {
 	}
 
 	public double run() {
-		Scanner myObj = new Scanner(System.in);
-		System.out.println("Your balance: " + balance);
-		System.out.println("Press 1 to start playing: ");
+		//Scanner myObj = new Scanner(System.in);
+		g.lblBalanceBJ.setText(("Your balance: " + balance));
+		
+		double bet = Double.parseDouble(g.txtBetBJ.getText());
+		g.btnHit.setVisible(true);
+		g.btnStand.setVisible(true);
+		play(bet);
+		
+		/*System.out.println("Press 1 to start playing: ");
 		if(myObj.nextLine().equals("1")) {
 			System.out.println("Enter amount to bet(no \'$\'): ");
 			double bet = Double.parseDouble(myObj.nextLine());
@@ -253,7 +261,7 @@ private void compareHands(boolean bust) {
 				System.out.println("shutting down");
 			}
 		}	
-		myObj.close();
+		myObj.close();*/
 		return balance;
 
 	}

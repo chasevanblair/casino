@@ -2,7 +2,7 @@
 public class Person {
 	private String name;
 	private double balance;
-	
+
 	public Person(String name, double balance) {
 		this.name = name;
 		this.balance = balance;
