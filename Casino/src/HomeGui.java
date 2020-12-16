@@ -37,6 +37,7 @@ public class HomeGui extends JPanel {
 	public JButton btnDeal;
 	public JButton btnStand;
 	public JButton btnHit;
+	public JLabel lblResult;
 	
 	public HomeGui() {
 		setLayout(new BorderLayout(0, 0));
@@ -139,31 +140,37 @@ public class HomeGui extends JPanel {
 		blackJack.add(txtPlayer);
 		
 		lblBalanceBJ = new JLabel("");
-		lblBalanceBJ.setBounds(170, 216, 46, 14);
+		lblBalanceBJ.setHorizontalAlignment(SwingConstants.CENTER);
+		lblBalanceBJ.setBounds(39, 213, 296, 14);
 		blackJack.add(lblBalanceBJ);
 		
 		lblBetBJ = new JLabel("Bet Amount:");
-		lblBetBJ.setBounds(39, 151, 89, 14);
+		lblBetBJ.setBounds(21, 191, 92, 14);
 		blackJack.add(lblBetBJ);
 		
 		txtBetBJ = new JTextField();
-		txtBetBJ.setBounds(106, 148, 144, 20);
+		txtBetBJ.setBounds(123, 188, 125, 20);
 		blackJack.add(txtBetBJ);
 		txtBetBJ.setColumns(10);
 		
 		btnDeal = new JButton("Deal");
-		btnDeal.setBounds(264, 147, 89, 23);
+		btnDeal.setBounds(258, 187, 89, 23);
 		blackJack.add(btnDeal);
 		
 		btnStand = new JButton("Stand");
-		btnStand.setBounds(75, 176, 89, 23);
+		btnStand.setBounds(39, 238, 89, 23);
 		btnStand.setVisible(false);
 		blackJack.add(btnStand);
 		
 		btnHit = new JButton("Hit");
-		btnHit.setBounds(230, 176, 89, 23);
+		btnHit.setBounds(246, 238, 89, 23);
 		btnHit.setVisible(false);
 		blackJack.add(btnHit);
+		
+		lblResult = new JLabel("");
+		lblResult.setHorizontalAlignment(SwingConstants.CENTER);
+		lblResult.setBounds(39, 151, 314, 29);
+		blackJack.add(lblResult);
 		
 		
 		

@@ -1,3 +1,5 @@
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Collections;
 import java.util.Scanner;
 import java.util.Stack;
@@ -7,7 +9,7 @@ public class BlackJack {
 	//or deck class which has a definition for card in the same file and handles making the deck inside there
 	//ie deck.deal if number of hands dealt is > 5 shuffle the deck as that is what casinos do
 	//queue of cards with a shuffle method once deck is finished
-	private double balance;
+	public double balanceBJ;
 	private Stack<Card> deck = new Stack<Card>();
 	private Stack<Card> playerHand = new Stack<Card>();
 	private Stack<Card> dealerHand = new Stack<Card>();
@@ -15,14 +17,23 @@ public class BlackJack {
 	private int playerHandSum = 0;
 	private int dealerHandSum = 0;
 	HomeGui g = new HomeGui();
+	String move;
+	double bet;
+	boolean bust = false;
+	boolean dealerAce = false;
+
 
 
 	public BlackJack(double balance, HomeGui g) {
 		this.g = g;
-		this.balance = balance;
+		this.balanceBJ = balance;
 		shuffle();
 	}
-
+	public double endHand() {
+		g.btnHit.setEnabled(false);
+		g.btnStand.setEnabled(false);
+		return balanceBJ;
+	}
 	public void buildDeck() {
 		deck.clear();
 		String cards[] = new String[] {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "jack", "queen", "king", "ace"};
@@ -46,13 +57,60 @@ public class BlackJack {
 		Collections.shuffle(deck);
 	}
 
-private void compareHands(boolean bust) {
+	public boolean compareHands() {
+		//return true if player wins or push
 		
-		String winner = "dealer wins";
-		String dealerStr = "Dealer hand: ";
-		for(Card c : dealerHand) {
-			dealerStr += (c.toString() + ", ");
-		} 
+		boolean dealerDraw = true;
+		boolean dealerBust = false;
+		if(dealerHandSum > 16) {
+			dealerDraw = false;
+		}
+		
+		while(dealerDraw) {
+			Card d = deck.pop();
+			dealerHand.push(d);
+			
+			dealerHandSum += Integer.parseInt(d.getValue());
+			if(dealerHandSum > 21 && dealerAce) {
+				dealerHandSum -= 10;
+			}
+			else if(dealerHandSum > 21) {
+				dealerBust = true;
+				return true;
+			}
+			if(dealerHandSum > 16) {
+				dealerDraw = false;
+			}
+		}
+		if(dealerBust) {
+			
+			g.lblResult.setText("Dealer busts. Player won $" + bet);
+			balanceBJ += bet * 2;
+		}
+		else if(playerHandSum < dealerHandSum) {
+			String dealerFinal = "";
+			for(Card d : dealerHand) {
+				dealerFinal += d.toString() + "\n";
+			}
+			g.txtDealer.setText(dealerFinal);
+			g.lblResult.setText("Dealer wins. Player lost $" + bet);
+			balanceBJ -= bet;
+			return false;
+		}else if(playerHandSum > dealerHandSum) {
+			g.lblResult.setText("Player wins. Won $" + bet);
+			balanceBJ += bet * 2;
+			return true;
+		}else if(playerHandSum == dealerHandSum) {
+			String dealerFinal = "";
+			for(Card d : dealerHand) {
+				dealerFinal += d.toString() + "\n";
+			}
+			g.txtDealer.setText(dealerFinal);
+			g.lblResult.setText("Push. Bets returned.");
+			return true;
+		}
+		return false;
+		/*
 		if(playerHandSum != dealerHandSum) {
 			if(!bust) {
 				if(playerHandSum == 21) {
@@ -68,15 +126,15 @@ private void compareHands(boolean bust) {
 				else if(dealerHandSum <= 17) {
 					Card drawn = deck.pop();
 					dealerHand.push(drawn);
-					
+
 					dealerHandSum += Integer.parseInt(drawn.getValue());
 					System.out.println(dealerStr + drawn.toString());
 					compareHands(bust);
 				}else {
-					
+
 					System.out.println(dealerStr + "\ndealer stands.");
 				}
-				
+
 				if(playerHandSum > dealerHandSum)
 					winner = "player wins";
 			}
@@ -90,13 +148,13 @@ private void compareHands(boolean bust) {
 			System.out.print(c.toString() + ", ");
 		}
 		System.out.println(winner);
-
+*/
 
 
 	}
 
-	private boolean deal() {
-		//return true if dealer doesn't have blackjack
+	public boolean deal() {
+		//return false if more cards aren't needed because either player has blackjack
 		playerHand.clear();
 		dealerHand.clear();
 		playerHandSum = 0;
@@ -105,148 +163,155 @@ private void compareHands(boolean bust) {
 		dealerHand.push(deck.pop());
 		playerHand.push(deck.pop());
 		dealerHand.push(deck.pop());
-		String out = "";
-		boolean ace = false;
+		boolean playerBlackJack = false, dealerBlackJack = false;
+
 
 		//moved code from hit to deal because values for dealer need to be checked for blackjack before game start
-		System.out.println("Your Hand: " + playerHand.get(0).toString() + ", " + playerHand.get(1).toString());
-		//if(playerHand.contains(new Card("ace", "spades")) || playerHand.contains(new Card("ace", "clubs")) || playerHand.contains(new Card("ace", "diamonds")) || playerHand.contains(new Card("ace", "hearts"))){
-			//ace = true;
-		//}
-		//can get 1 every time because this is always called on initial hand
+
 		playerHandSum += Integer.parseInt(playerHand.get(0).getValue()) + Integer.parseInt(playerHand.get(1).getValue());
-
-		for(int i=0;i<2;i++) {
-			String dealerCardVal = dealerHand.get(i).getValue();
-			dealerHandSum += Integer.parseInt(dealerCardVal);
-			if(dealerCardVal.equals("11")) {
-				dealerHand.get(i).setValue("ace");;
-			}
-			
-			String playerCardVal = playerHand.get(i).getValue();
-			playerHandSum += Integer.parseInt(playerCardVal);
-			if(playerCardVal.equals("11")) {
-				playerHand.get(i).setValue("ace");;
-			}
+		dealerHandSum += Integer.parseInt(dealerHand.get(0).getValue()) + Integer.parseInt(dealerHand.get(1).getValue());
+		if(dealerHand.get(0).getName().equals("ace") || dealerHand.get(1).getName().equals("ace")) {
+			dealerAce = true;
 		}
-		System.out.println(playerHandSum + "after for");
-		//dealerHandSum += (Integer.parseInt(dealerHand.get(0).getValue()) + Integer.parseInt(dealerHand.get(1).getValue()));
 		if(dealerHandSum == 21) {
-			
-			System.out.println("Dealer has blackjack.");
-			choice = "2";
-
-			if(playerHandSum == 21) {
-				System.out.println("push");
-			}
-			else {
-				System.out.println("not blackjack, hand lost");
-			}
-			return false;
-		}else {
-			System.out.println("dealer val " + dealerHandSum);
-			System.out.println("Dealer Hand: " + dealerHand.get(0) + ", hidden");
-			return true;
+			dealerBlackJack = true;
+		}	
+		if(playerHandSum == 21) {
+			playerBlackJack = true;
 		}
+		g.txtDealer.setText(dealerHand.get(0).toString() + "\nHidden");
+		g.txtPlayer.setText(playerHand.get(0).toString() + "\n" + playerHand.get(1).toString());
+
+		if(dealerBlackJack && playerBlackJack) {
+			g.txtDealer.setText(dealerHand.get(0).toString() + "\n" + dealerHand.get(1).toString());
+			g.lblResult.setText("Dealer has blackjack. Lost $" + bet);
+			g.lblResult.setText("Dealer and Player have blackjack. Money returned.");
+			return true;
+		}else if(dealerBlackJack) {
+			g.txtDealer.setText(dealerHand.get(0).toString() + "\n" + dealerHand.get(1).toString());
+			g.lblResult.setText("Dealer has blackjack. Lost $" + bet);
+			balanceBJ -= bet;
+			return false;
+
+		}else if(playerBlackJack) {
+			g.lblResult.setText("You have blackjack. Won $" + bet);
+			balanceBJ += bet * 3;
+			return false;
+		}
+		
+		return true;
 	}
 
-	private boolean hit() {
+	public boolean hit() {
 		//return false if user doesn't bust
-		
-		System.out.println("WSFRE");
-		String out = "Your hand: ";
+
+		String out = "";
 		boolean ace = false;
+		boolean bust = false;
 		/*if(playerHand.contains(new Card("ace", "spades")) || playerHand.contains(new Card("ace", "clubs")) || playerHand.contains(new Card("ace", "diamonds")) || playerHand.contains(new Card("ace", "hearts"))){
 			ace = true;
 		}*/
-		
-		
+
+
 		Card c = deck.pop();
 		playerHand.push(c);
-		
+
 		for(Card cx : playerHand) {
-			String cardVal = cx.toString();
 			if(c.getValue().equals("11")) {
 				ace = true;
-				cardVal = "ace";
 			}
-			out += cardVal + ", ";
+			out += cx.toString() + "\n";
 		}
+		g.txtPlayer.setText(out);
 		//playerHandSum += Integer.parseInt(c.getValue());
 		//out += c.toString() + ", ";
 		if (playerHandSum > 21 && ace) {
 			playerHandSum -= 10;
 			//change ace value from 11 to 1
+			bust = false;
 		}
+		playerHandSum += Integer.parseInt(c.getValue());
+		g.lblPlayerHand.setText(g.lblPlayerHand.getText() + playerHandSum);
 		if(playerHandSum > 21) {
-			System.out.println(out);
-			System.out.println(playerHandSum);
-			System.out.println("bust!");
-			//for(Card d : playerHand) {
-				//System.out.println(d.toString());
-			//}
+			g.lblResult.setText("Bust. Player lost $" + bet);
+			String dealerFinal = "";
 			for(Card d : dealerHand) {
-				String cardVal = d.toString();
-				if(c.getValue().equals("11")) {
-					ace = true;
-					cardVal = "ace";
-				}
-				//System.out.println(cardVal);
+				dealerFinal += d.toString() + "\n";
 			}
-			choice = "2";
-			return true;
+			g.txtDealer.setText(dealerFinal);
+			bust = true;
 		}
-		System.out.println(out);
-		return false;
-
+		return bust;
 	}
 
 	public void play(double bet) {
-		
+
 		boolean bust = deal();
 		System.out.println("Choose move: Hit (1), Stand (2)1");
-		Scanner myObj = new Scanner(System.in);
-		
-		choice = myObj.nextLine();
-		if(choice.equals("1")) {
-			bust = hit();
-			//choice = myObj.nextLine();
-		}
 
 		while(!bust) {
-			
-				System.out.println("Choose move: Hit (1), Stand (2)2");
-				choice = myObj.nextLine();
-				if(choice.equals("1")) {
-					bust = hit();
-					System.out.println(playerHand.toString());
-					System.out.println("Choose move: Hit (1), Stand (2)3");
 
-					choice = myObj.nextLine();
-				}
+			System.out.println("Choose move: Hit (1), Stand (2)2");
+			if(move.equals("hit")) {
+				bust = hit();
+				System.out.println(playerHand.toString());
+				System.out.println("Choose move: Hit (1), Stand (2)3");
 
-			
+			}else if(move.equals("stand:")) {
+
+			}
+
+
 		}
-		compareHands(bust);
+		compareHands();
 
 
 
 	}
-
+/*
 	public double run() {
 		//Scanner myObj = new Scanner(System.in);
-		g.lblBalanceBJ.setText(("Your balance: " + balance));
-		
+		g.lblBalanceBJ.setText(("Your balance: " + balanceBJ));
+
 		double bet = Double.parseDouble(g.txtBetBJ.getText());
-		g.btnHit.setVisible(true);
-		g.btnStand.setVisible(true);
-		play(bet);
-		
-		/*System.out.println("Press 1 to start playing: ");
+		this.bet = bet;
+		//deal false on dealer blackjack
+		if (deal()) {
+			
+		}
+		if (deal() || !bust) {
+			g.btnHit.setVisible(true);
+			g.btnStand.setVisible(true);
+			g.btnHit.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					bust = !hit();
+				}
+
+			});
+			g.btnStand.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					if(!bust) {
+						
+						boolean playerWins = compareHands();
+					}
+
+				}
+
+			});
+		}
+		else{
+			g.btnHit.setVisible(false);
+			g.btnStand.setVisible(false);
+		};
+			//play(bet);
+
+			/*System.out.println("Press 1 to start playing: ");
 		if(myObj.nextLine().equals("1")) {
 			System.out.println("Enter amount to bet(no \'$\'): ");
 			double bet = Double.parseDouble(myObj.nextLine());
-			
+
 			int playAmt = 0;
 			play(bet, playAmt);
 			System.out.println("Play again? yes (1), no (2): aa ee oo ");
@@ -261,9 +326,9 @@ private void compareHands(boolean bust) {
 				System.out.println("shutting down");
 			}
 		}	
-		myObj.close();*/
-		return balance;
-
+		myObj.close();
+			return balanceBJ;
+*/
 	}
 	/*
 	public static void main(String[] args) {
@@ -274,7 +339,7 @@ private void compareHands(boolean bust) {
 		if(myObj.nextLine().equals("1")) {
 			System.out.println("Enter amount to bet(no \'$\'): ");
 			double bet = Double.parseDouble(myObj.nextLine());
-			
+
 			int playAmt = 0;
 			b.play(bet, playAmt);
 			System.out.println("Play again? yes (1), no (2): ");
@@ -290,4 +355,4 @@ private void compareHands(boolean bust) {
 		}	
 		myObj.close();
 	}*/
-}
+

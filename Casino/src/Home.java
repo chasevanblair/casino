@@ -44,7 +44,35 @@ public class Home {
 	//main runs of each game return balance made/lost for each session
 	public void playBlackjack() {
 		BlackJack b = new BlackJack(gambler.getBalance(), g);
-		gambler.setBalance(b.run());
+		g.btnHit.setEnabled(true);
+		g.btnStand.setEnabled(true);
+		g.txtDealer.setText(null);
+		g.txtPlayer.setText(null);
+
+		if(!b.deal()) {
+			gambler.setBalance(b.balanceBJ);
+		}else {
+			g.btnHit.setVisible(true);
+			g.btnStand.setVisible(true);
+			g.btnHit.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					if(b.hit()) {
+						gambler.setBalance(b.endHand());
+					}
+				}
+
+			});
+			g.btnStand.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					b.compareHands();
+					gambler.setBalance(b.endHand());
+				}
+
+			});
+		}
+		//gambler.setBalance(b.run());
 		
 	}
 	
@@ -134,7 +162,7 @@ public class Home {
                 playBlackjack();
             }
 
-        })
+        });
 
 		
 		frame.add(g,BorderLayout.CENTER);
