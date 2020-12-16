@@ -21,6 +21,10 @@ public class Card {
 		return value;
 	}
 	
+	public void setValue(String value) {
+		this.value = value;
+	}
+	
 	@Override
 	public String toString() {
 		return value + " of " + suit;

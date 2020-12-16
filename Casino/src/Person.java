@@ -8,7 +8,10 @@ public class Person {
 		this.balance = balance;
 	}
 	
-	
+	@Override
+	public String toString() {
+		return name + ", $" + balance;
+	}
 
 	public String getName() {
 		return name;

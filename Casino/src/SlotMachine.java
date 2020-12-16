@@ -11,8 +11,10 @@ public class SlotMachine {
 
 	private ArrayList<String> values = new ArrayList<String>();
 	private int size;
+	private HomeGui g;
 
-	public SlotMachine(double moneyLeft) {
+	public SlotMachine(double moneyLeft, HomeGui g) {
+		this.g = g;
 		this.moneyLeft = moneyLeft;
 
 		values.add("1");
@@ -105,6 +107,9 @@ public class SlotMachine {
 			results.add(values.get(rand.nextInt(size)));
 			results.add(values.get(rand.nextInt(size)));
 			spinNum++;
+			g.result1.setText(first);
+			g.result2.setText(second);
+			g.result3.setText(third);
 			
 			double mult = 1;
 			boolean win = false;
@@ -139,14 +144,37 @@ public class SlotMachine {
 		
 	}
 
-
-
-
-	public static void main(String[] args){
+	public double run(){
 		//get user input to pass their bet amount to the slot. need a welcome message prompting amount
 		//need to create rarity values for 777 jackpot and 2x
 		//need return method which takes user back to home and sends the moneyLeft value
-		SlotMachine s = new SlotMachine("999999");
+		SlotMachine s = new SlotMachine(moneyLeft);
+		s.spin(1);
+		boolean again = true;
+		//Scanner myObj = new Scanner(System.in);  // Create a Scanner object
+
+		/*while(again) {
+			System.out.print("Spin again? (Y/N): ");
+			if(myObj.next().equalsIgnoreCase("N")) {
+				again = false;
+				System.out.println("Thanks for playing!");
+			}
+			else {
+				System.out.print("Enter bet amount: ");
+				s.spin(Double.parseDouble(myObj.next()));
+			}
+			
+		}*/
+		
+		return moneyLeft;
+	}
+
+
+	/*public static void main(String[] args){
+		//get user input to pass their bet amount to the slot. need a welcome message prompting amount
+		//need to create rarity values for 777 jackpot and 2x
+		//need return method which takes user back to home and sends the moneyLeft value
+		SlotMachine s = new SlotMachine(999999);
 		s.spin(1);
 		boolean again = true;
 		Scanner myObj = new Scanner(System.in);  // Create a Scanner object
@@ -163,6 +191,6 @@ public class SlotMachine {
 			}
 			
 		}
-	}
+	}*/
 
 }
