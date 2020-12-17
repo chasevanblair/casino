@@ -158,13 +158,13 @@ public class HomeGui extends JPanel {
 		blackJack.add(btnDeal);
 		
 		btnStand = new JButton("Stand");
+		btnStand.setEnabled(false);
 		btnStand.setBounds(39, 238, 89, 23);
-		btnStand.setVisible(false);
 		blackJack.add(btnStand);
 		
 		btnHit = new JButton("Hit");
+		btnHit.setEnabled(false);
 		btnHit.setBounds(246, 238, 89, 23);
-		btnHit.setVisible(false);
 		blackJack.add(btnHit);
 		
 		lblResult = new JLabel("");

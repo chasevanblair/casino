@@ -26,10 +26,12 @@ public class Home {
 	private JPanel panel;
 	private HomeGui g;
     private int spin = 0;
+	BlackJack b;
+
 	
 	public Home(String name, double baseBalance) {
 		
-		
+
 		gambler = new Person(name, baseBalance);
 		gamblers.add(gambler);
 		gamblers.add(new Person("jeff", 32223.21));
@@ -43,38 +45,21 @@ public class Home {
 	
 	//main runs of each game return balance made/lost for each session
 	public void playBlackjack() {
-		BlackJack b = new BlackJack(gambler.getBalance(), g);
+		
+		//after first hand the textarea shows one hand before hit and a different hand after comprising of all the hit cards before
+		//also busts after first hand basically no matter what
+		System.out.println("bj builat");
 		g.btnHit.setEnabled(true);
 		g.btnStand.setEnabled(true);
 		g.txtDealer.setText(null);
 		g.txtPlayer.setText(null);
+		gambler.setBalance(b.deal());
 
-		if(!b.deal()) {
-			gambler.setBalance(b.balanceBJ);
-		}else {
-			g.btnHit.setVisible(true);
-			g.btnStand.setVisible(true);
-			g.btnHit.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					if(b.hit()) {
-						gambler.setBalance(b.endHand());
-					}
-				}
-
-			});
-			g.btnStand.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					b.compareHands();
-					gambler.setBalance(b.endHand());
-				}
-
-			});
+			
 		}
 		//gambler.setBalance(b.run());
 		
-	}
+	
 	
 	public void playSlots() {
 		SlotMachine s = new SlotMachine(gambler.getBalance(), g);
@@ -131,6 +116,7 @@ public class Home {
 		g.userData.setText( "Name: " + gambler.getName() + "\nBalance: $" + gambler.getBalance());
 		g.money = balance;
 		g.lblBalance.setText("Balance: $" + gambler.getBalance());
+		b = new BlackJack(gambler.getBalance(), g);
 
 		g.btnRefresh.addActionListener(new ActionListener() {
             @Override
@@ -156,10 +142,32 @@ public class Home {
 
         });
 		
+		
+		g.btnHit.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("PERFORMED-------------");
+				//double ace returns 22
+				if (b.hit()){
+					gambler.setBalance(b.endHand());
+				}
+			}
+
+		});
+		g.btnStand.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				b.compareHands();
+				gambler.setBalance(b.endHand());
+			}
+
+		});
 		g.btnDeal.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                playBlackjack();
+            	g.btnHit.setEnabled(true);
+        		g.btnStand.setEnabled(true);
+               gambler.setBalance(b.deal());
             }
 
         });
