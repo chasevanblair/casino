@@ -13,11 +13,9 @@ public class BlackJack {
 	private Stack<Card> deck = new Stack<Card>();
 	private Stack<Card> playerHand = new Stack<Card>();
 	private Stack<Card> dealerHand = new Stack<Card>();
-	String choice = "";
 	private int playerHandSum = 0;
 	private int dealerHandSum = 0;
 	HomeGui g = new HomeGui();
-	String move;
 	double bet;
 	boolean bust = false;
 	boolean dealerAce = false;
@@ -33,10 +31,12 @@ public class BlackJack {
 		shuffle();
 	}
 	public double endHand() {
-		System.out.println("end called");
+		//ends hand by clearing hand textareas and disabling hit/stand
+		//updates balance
 		g.lblBalanceBJ.setText("Balance: $" + balanceBJ);
 		g.btnHit.setEnabled(false);
 		g.btnStand.setEnabled(false);
+		g.btnDeal.setEnabled(true);
 		playerHand.clear();
 		dealerHand.clear();
 		playerHandSum = 0;
@@ -71,20 +71,18 @@ public class BlackJack {
 	}
 
 	public void compareHands() {
-		//return true if player wins or push
-		
+		//to be called on stand or player reaching 21
 		boolean dealerDraw = true;
 		boolean dealerBust = false;
-		//cont set to false on either player's blackjack
-		boolean cont = true;
 		if(dealerHandSum > 16) {
 			dealerDraw = false;
 		}
-		
+
 		while(dealerDraw) {
+			//dealer draws until 16 or higher then stands
 			Card d = deck.pop();
 			dealerHand.push(d);
-			
+
 			dealerHandSum += Integer.parseInt(d.getValue());
 			if(dealerHandSum > 21 && dealerAce) {
 				dealerHandSum -= 10;
@@ -92,7 +90,7 @@ public class BlackJack {
 			else if(dealerHandSum > 21) {
 				dealerBust = true;
 			}
-			if(dealerHandSum > 16) {
+			if(dealerHandSum >= 16) {
 				dealerDraw = false;
 			}
 		}
@@ -105,14 +103,14 @@ public class BlackJack {
 		}
 		g.txtDealer.setText(dealerFinal);
 		g.lblResult.setText("Dealer wins. Player lost $" + bet);
-		
+
 		if(dealerBust) {
-			
+
 			g.lblResult.setText("Dealer busts. Player won $" + bet);
 			balanceBJ += bet * 2;
 		}
 		else if(playerHandSum < dealerHandSum) {
-			
+
 			balanceBJ -= bet;
 		}else if(playerHandSum > dealerHandSum) {
 			g.lblResult.setText("Player wins. Won $" + bet);
@@ -126,23 +124,23 @@ public class BlackJack {
 
 	public double deal() {
 		//return false if more cards aren't needed because either player has blackjack
-
+		moveAmt++;
+		if(moveAmt == 5) {
+			shuffle();
+		}
 		g.lblResult.setText("");
 		double bet = Double.parseDouble(g.txtBetBJ.getText());
 		this.bet = bet;
 		balanceBJ -= bet;
 		g.lblBalanceBJ.setText("Balance: $" + balanceBJ);
 
-		int cardsDealt = 0;
 		playerHand.clear();
 		dealerHand.clear();
 		playerHandSum = 0;
 		dealerHandSum = 0;
 		playerHand.push(deck.pop());
-		cardsDealt++;
 		dealerHand.push(deck.pop());
 		playerHand.push(deck.pop());
-		cardsDealt++;
 		dealerHand.push(deck.pop());
 		playerBlackJack = false; 
 		dealerBlackJack = false;
@@ -155,6 +153,8 @@ public class BlackJack {
 		if(dealerHand.get(0).getName().equals("ace") || dealerHand.get(1).getName().equals("ace")) {
 			dealerAce = true;
 		}
+		//checks for starting blackjacks so the rest of the code doesn't execute
+		//double aces will default to 12 (11+1)
 		if(dealerHandSum == 21) {
 			dealerBlackJack = true;
 		}else if(dealerHandSum == 22) {
@@ -167,10 +167,12 @@ public class BlackJack {
 			playerAce = true;
 			playerHandSum = 12;
 		}
+		//initial hand text
 		g.txtDealer.setText(dealerHand.get(0).toString() + "\nHidden");
 		g.txtPlayer.setText(playerHand.get(0).toString() + "\n" + playerHand.get(1).toString());
 		g.lblPlayerHand.setText("Player Hand:" + playerHandSum);
 
+		//what to do on initial blackjack
 		if(dealerBlackJack && playerBlackJack) {
 			g.txtDealer.setText(dealerHand.get(0).toString() + "\n" + dealerHand.get(1).toString());
 			g.lblResult.setText("Dealer has blackjack. Lost $" + bet);
@@ -187,19 +189,17 @@ public class BlackJack {
 			balanceBJ += bet * 3;
 			return endHand();
 		}
-		System.out.println(cardsDealt + ", " + playerHand.size() + ", " + playerHandSum + "\n" + playerHand.toString());
 		return balanceBJ;
 	}
+
 	public boolean hit() {
-		//return false if user doesn't bust
+		//return false if hand ends ie. blackjack or bust
 		String out = "";
 		playerAce = false;
 		bust = false;
-		/*if(playerHand.contains(new Card("ace", "spades")) || playerHand.contains(new Card("ace", "clubs")) || playerHand.contains(new Card("ace", "diamonds")) || playerHand.contains(new Card("ace", "hearts"))){
-			ace = true;
-		}*/
 
 
+		//draw card add to hand
 		Card c = deck.pop();
 		playerHand.push(c);
 
@@ -210,8 +210,7 @@ public class BlackJack {
 			out += cx.toString() + "\n";
 		}
 		g.txtPlayer.setText(out);
-		//playerHandSum += Integer.parseInt(c.getValue());
-		//out += c.toString() + ", ";
+		//update player hand output with new card
 		if (playerHandSum > 21 && playerAce) {
 			playerHandSum -= 10;
 			//change ace value from 11 to 1
@@ -219,13 +218,14 @@ public class BlackJack {
 		}
 		playerHandSum += Integer.parseInt(c.getValue());
 		g.lblPlayerHand.setText("Player Hand:" + playerHandSum);
+		//bust calc
 		if(playerHandSum > 21) {
 			g.lblResult.setText("Bust. Player lost $" + bet);
 			String dealerFinal = "";
 			for(Card d : dealerHand) {
 				dealerFinal += d.toString() + "\n";
 			}
-			
+
 			g.txtDealer.setText(dealerFinal);
 			bust = true;
 		}
@@ -234,11 +234,9 @@ public class BlackJack {
 			compareHands();
 			bust = true;
 		}
-		System.out.println("hit: " + playerHand.toString());
-
 		return bust;
 	}
-	
+
 
 }
-	
+
