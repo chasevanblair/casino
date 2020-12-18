@@ -55,7 +55,6 @@ public class Home {
 
 
 	}
-	//gambler.setBalance(b.run());
 
 
 
@@ -66,7 +65,6 @@ public class Home {
 			spin = 0;
 		}
 		gambler.setBalance(s.run());
-		//s.winDef = false;
 		spin++;
 
 	}
@@ -87,9 +85,6 @@ public class Home {
 			gamblers.set(j,key);
 		}
 
-
-
-
 	}
 
 	public void drawHome() {
@@ -101,10 +96,7 @@ public class Home {
 		for(int x = 1; x <= gamblers.size(); x++) {
 			ret += (x + ": " + gamblers.get(x-1).toString() + "\n");
 		}
-
-
-
-
+		
 		this.g = new HomeGui();
 		g.leaderList.setText(ret);
 		g.userData.setText( "Name: " + gambler.getName() + "\nBalance: $" + gambler.getBalance());
@@ -184,31 +176,10 @@ public class Home {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setTitle("Casino");
 		frame.setVisible(true);
-
-
-
-
-
 	}
-
-	public void start() {
-		drawHome();
-
-		//else {
-		//System.out.println("Returning to home.");
-		//start();
-		//}
-	}
-
-
 
 	public static void main(String[] args) {
-		/*Scanner in = new Scanner(System.in);
 
-		System.out.println("Enter name: ");
-		String name = in.nextLine();
-		System.out.println("Enter balance: ");
-		double balance = Double.parseDouble(in.nextLine());*/
 		String name = "";
 		double balance = 0;
 
@@ -221,7 +192,8 @@ public class Home {
 		myPanel.add(Box.createHorizontalStrut(15)); // a spacer
 		myPanel.add(new JLabel("Wallet balance:"));
 		myPanel.add(yField);
-
+		
+		//prompt for user info
 		int result = JOptionPane.showConfirmDialog(null, myPanel, "Please Enter Data", JOptionPane.OK_CANCEL_OPTION);
 		if (result == JOptionPane.OK_OPTION) {
 			name = xField.getText();
@@ -232,8 +204,6 @@ public class Home {
 		}
 		Home h = new Home(name, balance);
 		h.drawHome();
-
-
 	}
 }
 

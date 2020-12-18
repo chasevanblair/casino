@@ -58,6 +58,7 @@ public class SlotMachine {
 		double chance = rand.nextDouble();
 		if(chance <= .3) {
 			//non 777 number match
+			val += rand.nextInt(6);
 			mult = 1.5;
 		}
 		else if(chance <= .6) {
@@ -163,9 +164,6 @@ public class SlotMachine {
 		//get user input to pass their bet amount to the slot. need a welcome message prompting amount
 
 		spin(Double.parseDouble(g.txtBetAmt.getText()));
-
-
-
 		return moneyLeft;
 	}
 
